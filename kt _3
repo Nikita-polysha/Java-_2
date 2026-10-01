@@ -52,3 +52,182 @@ public class Main {
         return -1;
     }
 }
+
+
+
+
+
+
+
+
+import java.util.ArrayList;
+import java.util.Arrays;
+
+public class HashDemo {
+
+    static int h(int k, int m) {
+        return (11 * k + 4) % m;
+    }
+
+    static void openAddressing(int[] A, int m) {
+        ArrayList<Integer>[] table = new ArrayList[m];
+        for (int i = 0; i < m; i++) {
+            table[i] = new ArrayList<>();
+        }
+
+        for (int k : A) {
+            int idx = h(k, m);
+            table[idx].add(k);       
+            System.out.println("Вставили " + k + " в ячейку " + idx);
+        }
+
+        System.out.println("\n=== ОТКРЫТАЯ АДРЕСАЦИЯ (цепочки) ===");
+        for (int i = 0; i < m; i++) {
+            System.out.println("[" + i + "] -> " + table[i]);
+        }
+    }
+
+    static void closedAddressing(int[] A, int m) {
+        Integer[] table = new Integer[m];  // null = пустая ячейка
+
+        for (int k : A) {
+            int idx = h(k, m);
+            int start = idx;
+            while (table[idx] != null) {
+                idx = (idx + 1) % m;
+                if (idx == start) {
+                    System.out.println("Таблица полна! Не смогли вставить " + k);
+                    return;
+                }
+            }
+            table[idx] = k;
+            System.out.println("Вставили " + k + " в ячейку " + idx);
+        }
+
+        System.out.println("\n=== ЗАКРЫТАЯ АДРЕСАЦИЯ (линейное пробирование) ===");
+        for (int i = 0; i < m; i++) {
+            if (table[i] == null) {
+                System.out.println("[" + i + "] -> _");
+            } else {
+                System.out.println("[" + i + "] -> " + table[i]);
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        int[] A = {67, 13, 49, 24, 40, 33, 58};
+        int m = 9;
+
+        System.out.println("=== Хеши (h(k) = (11k+4) mod 9) ===");
+        for (int k : A) {
+            System.out.println("h(" + k + ") = " + h(k, m));
+        }
+        System.out.println();
+
+        openAddressing(A, m);
+        System.out.println();
+        closedAddressing(A, m);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+import java.util.Arrays;
+import java.util.HashSet;
+
+public class Main {
+
+    static boolean duplicatesBruteForce(int[] a) {
+        int n = a.length;
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+                if (a[i] == a[j]) {
+                    return true;    
+                }
+            }
+        }
+        return false;              
+    }
+
+    static boolean duplicatesSort(int[] a) {
+        int[] b = a.clone();        
+        Arrays.sort(b);              
+        for (int i = 0; i < b.length - 1; i++) {
+            if (b[i] == b[i + 1]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    static boolean duplicatesHash(int[] a) {
+        HashSet<Integer> seen = new HashSet<>();
+        for (int x : a) {
+            if (seen.contains(x)) {  
+                return true;
+            }
+            seen.add(x);          
+        }
+        return false;
+    }
+
+    static boolean duplicatesCounting(int[] a, int k) {
+        int[] count = new int[k + 1]; 
+        for (int x : a) {
+            count[x]++;              
+            if (count[x] == 2) {    
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+
+        int[][] tests = {
+                {1, 2, 3, 4, 5},        // false — все уникальны
+                {1, 2, 3, 2, 5},        // true  — двойка повторяется
+                {7, 7},                 // true
+                {},                     // false — пустой массив
+                {42},                   // false — один элемент
+                {10, 20, 30, 40, 10},   // true
+                {5, 4, 3, 2, 1}         // false
+        };
+
+        boolean[] expected = {false, true, true, false, false, true, false};
+
+        for (int t = 0; t < tests.length; t++) {
+            int[] arr = tests[t];
+            int k = max(arr);          
+
+            boolean r1 = duplicatesBruteForce(arr);
+            boolean r2 = duplicatesSort(arr);
+            boolean r3 = duplicatesHash(arr);
+            boolean r4 = duplicatesCounting(arr, k);
+
+            System.out.println(
+                    Arrays.toString(arr)
+                            + " -> brute=" + r1
+                            + ", sort="  + r2
+                            + ", hash="  + r3
+                            + ", count=" + r4
+                            + " | ожидалось: " + expected[t]
+            );
+        }
+    }
+
+    static int max(int[] a) {
+        int m = 0;
+        for (int x : a) {
+            if (x > m) m = x;
+        }
+        return m;
+    }
+}

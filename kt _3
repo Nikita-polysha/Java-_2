@@ -1,0 +1,54 @@
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+
+    static int myHash(String word) {
+        String alphabet = "абвгдеёжзийклмнопрстуфхцчшщъыьэюя";
+        int h = 0;
+        for (char ch : word.toLowerCase().toCharArray()) {
+            int num = alphabet.indexOf(ch) + 1;
+            h = h * 31 + num;
+        }
+        return Math.abs(h) % 1000;
+    }
+
+    public static void main(String[] args) {
+
+        String[] names = {"артем", "аедрей", "миша", "гендий", "александр",
+                "мухамед", "лукиан", "наташа", "даша", "ваня"};
+
+        String[] fruits = {"яблоко", "банан", "груша", "апельсин", "виноград",
+                "киви", "манго", "слива", "персик", "лимон"};
+
+        HashMap<String, Integer> hashes = new HashMap<>();
+
+        System.out.println("=== Хеширование 10 имён ===");
+        System.out.println("Правило: hash = сумма(номер_буквы * 31^позиция) mod 1000");
+        System.out.println();
+
+        for (int i = 0; i < names.length; i++) {
+            String name  = names[i];
+            String fruit = fruits[i];
+            int h = myHash(name);
+            hashes.put(name, h);
+            System.out.println(name + " = " + fruit + " = " + h);
+        }
+
+        System.out.println();
+        System.out.println("=== Итоговая таблица (HashMap) ===");
+        for (Map.Entry<String, Integer> entry : hashes.entrySet()) {
+            String name  = entry.getKey();
+            int h        = entry.getValue();
+            String fruit = fruits[indexOf(names, name)];
+            System.out.println(name + " = " + fruit + " = " + h);
+        }
+    }
+
+    static int indexOf(String[] arr, String value) {
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i].equals(value)) return i;
+        }
+        return -1;
+    }
+}
